@@ -2,34 +2,59 @@ import { Link } from "react-router-dom";
 import logo from "../images/login-logo.png";
 import "./Login.css";
 import { useState } from "react";
-// import { GlobalState } from "../context/GlobalState";
 
-//firebase
 import { auth } from "../firebase.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useAuth } from "../context/GlobalState";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const { user } = useAuth();
   const [creartUserinput, setCreatUserInput] = useState({
     email: "",
     password: "",
   });
 
   const navigate = useNavigate();
+
+  //Sign In function
+  function handleSighIn(event) {
+    event.preventDefault();
+    signInWithEmailAndPassword(
+      auth,
+      creartUserinput.email,
+      creartUserinput.password
+    )
+      .then((auth) => {
+        if (auth) {
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  }
   //create for new user
   function handleCreateNewAcount(event) {
     event.preventDefault();
-    console.log("handleCreateNewAcount");
+
     createUserWithEmailAndPassword(
       auth,
       creartUserinput.email,
       creartUserinput.password
-    ).then((a) => navigate("/"));
+    )
+      .then((auth) => {
+        if (auth) {
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   }
-  console.log(user);
+
   return (
     <div className="login">
       <Link to={"/"}>
@@ -47,7 +72,6 @@ export default function Login() {
                 ...creartUserinput,
                 email: event.target.value,
               });
-              console.log(creartUserinput);
             }}
           ></input>
           <h5>Password</h5>
@@ -59,10 +83,13 @@ export default function Login() {
                 ...creartUserinput,
                 password: event.target.value,
               });
-              console.log(creartUserinput);
             }}
           ></input>
-          <button className="login-signInBtn" type="submit">
+          <button
+            className="login-signInBtn"
+            type="submit"
+            onClick={handleSighIn}
+          >
             Sign in
           </button>
           <p>

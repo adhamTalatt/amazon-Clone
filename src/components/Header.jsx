@@ -3,39 +3,52 @@ import logo from "../images/header-logo.png";
 import searchIcon from "../images/icons/searchIcon.png";
 import shopCartIcon from "../images/icons/shopping-cart.png";
 import "./Header.css";
+import { useAuth } from "../context/GlobalState";
+
+import { auth } from "../firebase";
+
 export default function Header() {
+  const { user, basket } = useAuth();
+
+  function handleAuthenticationSignOut() {
+    auth.signOut();
+  }
   return (
     <div className="header">
-      <Link to={"/"}>
-        <img className="header-logo" src={logo} alt="" />
+      <Link to="/">
+        <img className="header-logo" src={logo} alt="logo-img" />
       </Link>
       <div className="header-search">
-        <input type="text" className="header-searchInput" />
-        <img src={searchIcon} alt="" className="header-searchIcon" />
+        <input className="header-searchInput" type="text" />
+        <img className="header-searchIcon" src={searchIcon} alt="search-icon" />
       </div>
       <div className="header-nav">
-        <Link to="/login">
-          <div className="header-option">
-            <div className="header-optionLineOne">Hello Guest</div>
-            <div className="header-optionLineTwo">Sign In</div>
+        <Link to={!user && "/login"}>
+          <div className="header-option" onClick={handleAuthenticationSignOut}>
+            <span className="header-optionLineOne">
+              Hello {user ? `${user.email}` : "Guest"}
+            </span>
+            <span className="header-optionLineTwo">
+              {user ? "Sign Out" : "Sign In"}
+            </span>
           </div>
         </Link>
         <Link to="/orders">
           <div className="header-option">
-            <div className="header-optionLineOne">Returns</div>
-            <div className="header-optionLineTwo">& Orders</div>
+            <span className="header-optionLineOne">Returns</span>
+            <span className="header-optionLineTwo">& Orders</span>
           </div>
         </Link>
         <div className="header-option">
-          <div className="header-optionLineOne">your</div>
-          <div className="header-optionLineTwo">Prime</div>
+          <span className="header-optionLineOne">Your</span>
+          <span className="header-optionLineTwo">Prime</span>
         </div>
-        <Link to="/ckeckout">
-          <div className="header-option">
-            <div className="header-optionBasket">
-              <img src={shopCartIcon} alt="" />
-              <span className="header-optionLineTwo header-basketCount">3</span>
-            </div>
+        <Link to={user ? "/checkout" : "/login"}>
+          <div className="header-optionBasket">
+            <img src={shopCartIcon} />
+            <span className="header-optionLineTwo header-basketCount">
+              {basket.length == null ? "0" : basket.length}
+            </span>
           </div>
         </Link>
       </div>
